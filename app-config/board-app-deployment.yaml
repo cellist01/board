@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: pipeline-board-maven
+  name: 'board-application'
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: board-application
+  template:
+    metadata:
+      labels:
+        app: board-application
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/pipeline-board-maven/board-app:latest
+        imagePullPolicy: Always
+        name: board-application
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP

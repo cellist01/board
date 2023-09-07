@@ -1,0 +1,120 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  labels:
+    app.kubernetes.io/instance: board-application
+    app.kubernetes.io/name: board-application
+    pipeline.openshift.io/runtime: java
+    pipeline.openshift.io/runtime-version: openjdk-17-ubi8
+    pipeline.openshift.io/type: openshift
+  name: board-application
+spec:
+  description: The Pipeline to build and deploy the Hello World Java App service
+  params:
+  - default: image-registry.openshift-image-registry.svc:5000/pipeline-board-maven/board-app
+    description: The fully qualified image name e.g example.com
+    name: IMAGE_NAME
+    type: string
+  - default: Board
+    description: |-
+      The application profile to use for building the application. In this example it should be either:
+        * Board 
+    name: APP_PROFILE
+    type: string
+  - default: board-application
+    description: The Java App Service name
+    name: APP_NAME
+    type: string
+  - default: https://gitlab.cluster-2.poc.cloud/root/board-maven.git
+    description: The GitHub Repo of the Java Application
+    name: GITHUB_REPO_URL
+    type: string
+  - default: main
+    description: The GitHub revision to use
+    name: GITHUB_REPO_REVISION
+    type: string
+  - default: Board
+    description: The GitHub revision to use
+    name: GITHUB_REPO_SUBDIRECTORY
+    type: string
+  tasks:
+  - name: clone-sources
+    params:
+    - name: url
+      value: $(params.GITHUB_REPO_URL)
+    - name: revision
+      value: $(params.GITHUB_REPO_REVISION)
+    - name: deleteExisting
+      value: "true"
+    - name: sslVerify
+      value: "false"
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: source
+  - name: build-java-test
+    params:
+    - name: GOALS
+      value:
+      - -f
+      - $(params.APP_PROFILE)
+      - -P
+      - $(params.APP_PROFILE)
+      - -B
+      - clean
+      - test
+    runAfter:
+    - clone-sources
+    taskRef:
+      kind: ClusterTask
+      name: maven
+    workspaces:
+    - name: maven-settings
+      workspace: maven-settings
+    - name: source
+      workspace: source
+  - name: build-java-app
+    params:
+    - name: GOALS
+      value:
+      - -f
+      - $(params.APP_PROFILE)
+      - -P
+      - $(params.APP_PROFILE)
+      - -B
+      - -DskipTests
+      - clean
+      - package
+    runAfter:
+    - build-java-test
+    taskRef:
+      kind: ClusterTask
+      name: maven
+    workspaces:
+    - name: maven-settings
+      workspace: maven-settings
+    - name: source
+      workspace: source
+  - name: build-java-app-image
+    params:
+    - name: CONTEXT
+      value: $(params.APP_PROFILE)
+    - name: IMAGE
+      value: $(params.IMAGE_NAME)
+    - name: STORAGE_DRIVER
+      value: vfs
+    - name: TLSVERIFY
+      value: "false"
+    runAfter:
+    - build-java-app
+    taskRef:
+      kind: ClusterTask
+      name: buildah
+    workspaces:
+    - name: source
+      workspace: source
+  workspaces:
+  - name: source
+  - name: maven-settings

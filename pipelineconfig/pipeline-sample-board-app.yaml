@@ -65,6 +65,8 @@ spec:
       - -B
       - clean
       - test
+      - '-Dmaven.wagon.http.ssl.insecure=true' 
+      - '-Dmaven.wagon.http.ssl.allowall=true'
     runAfter:
     - clone-sources
     taskRef:
@@ -87,6 +89,8 @@ spec:
       - -DskipTests
       - clean
       - package
+      - '-Dmaven.wagon.http.ssl.insecure=true' 
+      - '-Dmaven.wagon.http.ssl.allowall=true'
     runAfter:
     - build-java-test
     taskRef:

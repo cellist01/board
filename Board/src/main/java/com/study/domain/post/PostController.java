@@ -35,7 +35,8 @@ public class PostController {
     }
 
     // 게시글 리스트 페이지
-    @GetMapping("/post/list.do")
+    //@GetMapping("/post/list.do")
+    @GetMapping("/")
     public String openPostList(@ModelAttribute("params") final SearchDto params, Model model) {
         PagingResponse<PostResponse> response = postService.findAllPost(params);
         model.addAttribute("response", response);

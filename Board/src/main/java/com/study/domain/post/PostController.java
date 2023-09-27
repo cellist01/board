@@ -40,8 +40,7 @@ public class PostController {
     public String openPostList(@ModelAttribute("params") final SearchDto params, Model model) {
         PagingResponse<PostResponse> response = postService.findAllPost(params);
         model.addAttribute("response", response);
-    //    return "post/list";
-        return "/";
+        return "post/list";
     }
 
     // 게시글 상세 페이지

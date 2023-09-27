@@ -36,7 +36,7 @@ public class PostController {
 
     // 게시글 리스트 페이지
     @GetMapping("/post/list.do")
-    @GetMapping("/")
+    //@GetMapping("/")
     public String openPostList(@ModelAttribute("params") final SearchDto params, Model model) {
         PagingResponse<PostResponse> response = postService.findAllPost(params);
         model.addAttribute("response", response);
@@ -55,8 +55,8 @@ public class PostController {
     @PostMapping("/post/save.do")
     public String savePost(final PostRequest params, Model model) {
         postService.savePost(params);
-    //    MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
-        MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/", RequestMethod.GET, null);
+        MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
+    //    MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/", RequestMethod.GET, null);
         return showMessageAndRedirect(message, model);
     }
 
@@ -64,8 +64,8 @@ public class PostController {
     @PostMapping("/post/update.do")
     public String updatePost(final PostRequest params, Model model) {
         postService.updatePost(params);
-    //    MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
-        MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", "/", RequestMethod.GET, null);
+        MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
+    //    MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", "/", RequestMethod.GET, null);
         return showMessageAndRedirect(message, model);
     }
 
@@ -73,8 +73,8 @@ public class PostController {
     @PostMapping("/post/delete.do")
     public String deletePost(@RequestParam final Long id, Model model) {
         postService.deletePost(id);
-    //    MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
-        MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/", RequestMethod.GET, null);
+        MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
+    //    MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/", RequestMethod.GET, null);
         return showMessageAndRedirect(message, model);
     }
 

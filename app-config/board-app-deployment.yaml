@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: pipeline-board-maven
+  namespace: board
   name: 'board-application'
 spec:
   replicas: 2
@@ -14,7 +14,7 @@ spec:
         app: board-application
     spec:
       containers:
-      - image: image-registry.openshift-image-registry.svc:5000/pipeline-board-maven/board-app:latest
+      - image: image-registry.openshift-image-registry.svc:5000/board/board-app:latest
         imagePullPolicy: Always
         name: board-application
         ports:

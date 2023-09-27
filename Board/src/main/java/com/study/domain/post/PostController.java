@@ -41,7 +41,7 @@ public class PostController {
         PagingResponse<PostResponse> response = postService.findAllPost(params);
         model.addAttribute("response", response);
     //    return "post/list";
-        return "";
+        return "/";
     }
 
     // 게시글 상세 페이지

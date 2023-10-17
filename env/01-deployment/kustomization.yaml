@@ -4,5 +4,6 @@ configMapGenerator:
 - name: generator-configmap-test
   files:
   - settings.xml
+nameSuffix: -dev
 bases:
 - ../base

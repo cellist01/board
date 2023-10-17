@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  settings.xml: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<settings xmlns=\"http://maven.apache.org/SETTINGS/1.1.0\"
+    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.1.0
+    http://maven.apache.org/xsd/settings-1.1.0.xsd\">\r\n  <servers>\r\n    <server>\r\n
+    \     <id>nexus-snapshots</id>\r\n      <username>admin</username>\r\n      <password>password</password>\r\n
+    \   </server>\r\n    <server>\r\n      <id>nexus-releases</id>\r\n      <username>admin</username>\r\n
+    \     <password>password</password>\r\n    </server>\r\n  </servers>\r\n  <mirrors>\r\n
+    \   <mirror>\r\n      <id>nexus</id>\r\n      <mirrorOf>*</mirrorOf>\r\n      <url>http://nexus.cluster-2.poc.cloud:8081/repository/my-repo-group/repository/</url>\r\n
+    \   </mirror>\r\n  </mirrors>\r\n  <profiles>\r\n    <profile>\r\n      <id>nexus</id>\r\n
+    \     <!--Enable snapshots for the built in central repo to direct -->\r\n      <!--all
+    requests to nexus via the mirror -->\r\n      <repositories>\r\n        <repository>\r\n
+    \         <id>central</id>\r\n          <url>http://nexus.cluster-2.poc.cloud:8081/repository/my-repo-group/repository</url>\r\n
+    \         <releases>\r\n            <enabled>true</enabled>\r\n          </releases>\r\n
+    \         <snapshots>\r\n            <enabled>true</enabled>\r\n          </snapshots>\r\n
+    \       </repository>\r\n      </repositories>\r\n        <pluginRepositories>\r\n
+    \       <pluginRepository>\r\n          <id>central</id>\r\n          <url>http://central</url>\r\n
+    \         <releases>\r\n            <enabled>true</enabled>\r\n          </releases>\r\n
+    \         <snapshots>\r\n            <enabled>true</enabled>\r\n          </snapshots>\r\n
+    \       </pluginRepository>\r\n        </pluginRepositories> \r\n    </profile>\r\n
+    \ </profiles>\r\n  <activeProfiles>\r\n    <!--make the profile active all the
+    time -->\r\n    <activeProfile>nexus</activeProfile>\r\n  </activeProfiles>\r\n</settings>\r\n"
+kind: ConfigMap
+metadata:
+  name: maven-settings

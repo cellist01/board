@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  settings.xml: "<settings>\r\n    <pluginGroups>\r\n        <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>\r\n
+    \   </pluginGroups>\r\n    <profiles>\r\n        <profile>\r\n            <id>sonar</id>\r\n
+    \           <activation>\r\n                <activeByDefault>true</activeByDefault>\r\n
+    \           </activation>\r\n            <properties>\r\n                <!--
+    Optional URL to server. Default value is http://localhost:9000 -->\r\n                <sonar.host.url>\r\n
+    \                 http://sonarqube.apps.con1.mtp.local\r\n                </sonar.host.url>\r\n
+    \           </properties>\r\n        </profile>\r\n     </profiles>\r\n</settings>"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2023-10-11T07:49:00Z"
+  name: sonar-settings
+  namespace: board
+  resourceVersion: "33486776"
+  uid: f53001ce-cf4d-4e77-9796-6da2b7ab1437

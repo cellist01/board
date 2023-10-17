@@ -1,0 +1,291 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: board-application-analyzer-pipeline
+spec:
+  params:
+    - default: 'board/board-app:tag'
+      name: IMAGE_NAME
+      type: string
+    - default: Board
+      name: APP_PROFILE
+      type: string
+    - default: board-application
+      name: APP_NAME
+      type: string
+    - default: 'https://github.com/cellist01/board.git'
+      name: GITHUB_REPO_URL
+      type: string
+    - default: main
+      name: GITHUB_REPO_REVISION
+      type: string
+    - default: Board
+      name: GITHUB_REPO_SUBDIRECTORY
+      type: string
+    - default: 'http://sonarqube.apps.con1.mtp.local/'
+      name: SONAR_URL
+      type: string
+    - default: sqp_9d4fdc87bf27673252e126a624ed6772a9fd348b
+      name: SONAR_AUTH_TOKEN
+      type: string
+  tasks:
+    - name: git-clone-source
+      params:
+        - name: url
+          value: $(params.GITHUB_REPO_URL)
+        - name: revision
+          value: $(params.GITHUB_REPO_REVISION)
+        - name: refspec
+          value: ''
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'false'
+        - name: crtFileName
+          value: ca-bundle.crt
+        - name: subdirectory
+          value: ''
+        - name: sparseCheckoutDirectories
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+        - name: httpProxy
+          value: ''
+        - name: httpsProxy
+          value: ''
+        - name: noProxy
+          value: ''
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:16b8e98aa03a874dfc0fd16cd4aaaeea193dc60882c61653e768f8f503fe33e3
+        - name: userHome
+          value: /home/git
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source
+    - name: git-clone-analyzer
+      params:
+        - name: url
+          value: $(params.GITHUB_REPO_URL)
+        - name: revision
+          value: $(params.GITHUB_REPO_REVISION)
+        - name: refspec
+          value: ''
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'false'
+        - name: crtFileName
+          value: ca-bundle.crt
+        - name: subdirectory
+          value: ''
+        - name: sparseCheckoutDirectories
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+        - name: httpProxy
+          value: ''
+        - name: httpsProxy
+          value: ''
+        - name: noProxy
+          value: ''
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:16b8e98aa03a874dfc0fd16cd4aaaeea193dc60882c61653e768f8f503fe33e3
+        - name: userHome
+          value: /home/git
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: analyzer-source
+    - name: analyze-source
+      params:
+        - name: MAVEN_IMAGE
+          value: >-
+            registry.redhat.io/ubi8/openjdk-17@sha256:7942acf43a41b8fd202de7c5f7745d9732fae00a401b3da06e1ac988ac26ba4d
+        - name: GOALS
+          value:
+            - '-f'
+            - Board
+            - 'sonar:sonar'
+            - '-Dsonar.projectName=board-analyzer'
+            - '-Dsonar.projectKey=board-analyzer'
+            - '-s  $(workspaces.maven-settings.path)/settings.xml'
+            - '-Dsonar.host.url=$(params.SONAR_URL)'
+            - '-Dsonar.login=$(params.SONAR_AUTH_TOKEN)'
+            - '-Dmaven.wagon.http.ssl.insecure=true'
+            - '-Dmaven.wagon.http.ssl.allowall=true'
+            - '-Dsonar.exclusions=**/*.java'
+        - name: MAVEN_MIRROR_URL
+          value: ''
+        - name: SERVER_USER
+          value: admin
+        - name: SERVER_PASSWORD
+          value: password
+        - name: PROXY_USER
+          value: ''
+        - name: PROXY_PASSWORD
+          value: ''
+        - name: PROXY_PORT
+          value: ''
+        - name: PROXY_HOST
+          value: ''
+        - name: PROXY_NON_PROXY_HOSTS
+          value: ''
+        - name: PROXY_PROTOCOL
+          value: http
+        - name: CONTEXT_DIR
+          value: .
+      runAfter:
+        - git-clone-analyzer
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: analyzer-source
+        - name: maven-settings
+          workspace: sonar-settings
+    - name: build-test-app
+      params:
+        - name: MAVEN_IMAGE
+          value: >-
+            registry.redhat.io/ubi8/openjdk-17@sha256:7942acf43a41b8fd202de7c5f7745d9732fae00a401b3da06e1ac988ac26ba4d
+        - name: GOALS
+          value:
+            - '-f'
+            - $(params.APP_PROFILE)
+            - '-P'
+            - $(params.APP_PROFILE)
+            - '-B'
+            - clean
+            - test
+            - '-Dmaven.wagon.http.ssl.insecure=true'
+            - '-Dmaven.wagon.http.ssl.allowall=true'
+        - name: MAVEN_MIRROR_URL
+          value: ''
+        - name: SERVER_USER
+          value: ''
+        - name: SERVER_PASSWORD
+          value: ''
+        - name: PROXY_USER
+          value: ''
+        - name: PROXY_PASSWORD
+          value: ''
+        - name: PROXY_PORT
+          value: ''
+        - name: PROXY_HOST
+          value: ''
+        - name: PROXY_NON_PROXY_HOSTS
+          value: ''
+        - name: PROXY_PROTOCOL
+          value: http
+        - name: CONTEXT_DIR
+          value: .
+      runAfter:
+        - git-clone-source
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: source
+        - name: maven-settings
+          workspace: maven-settings
+    - name: build-source-app
+      params:
+        - name: MAVEN_IMAGE
+          value: >-
+            registry.redhat.io/ubi8/openjdk-17@sha256:7942acf43a41b8fd202de7c5f7745d9732fae00a401b3da06e1ac988ac26ba4d
+        - name: GOALS
+          value:
+            - '-f'
+            - $(params.APP_PROFILE)
+            - '-P'
+            - $(params.APP_PROFILE)
+            - '-B'
+            - '-DskipTests'
+            - clean
+            - package
+            - '-Dmaven.wagon.http.ssl.insecure=true '
+            - '-Dmaven.wagon.http.ssl.allowall=true'
+        - name: MAVEN_MIRROR_URL
+          value: ''
+        - name: SERVER_USER
+          value: ''
+        - name: SERVER_PASSWORD
+          value: ''
+        - name: PROXY_USER
+          value: ''
+        - name: PROXY_PASSWORD
+          value: ''
+        - name: PROXY_PORT
+          value: ''
+        - name: PROXY_HOST
+          value: ''
+        - name: PROXY_NON_PROXY_HOSTS
+          value: ''
+        - name: PROXY_PROTOCOL
+          value: http
+        - name: CONTEXT_DIR
+          value: .
+      runAfter:
+        - build-test-app
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: source
+        - name: maven-settings
+          workspace: maven-settings
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: >-
+            image-registry.openshift-image-registry.svc:5000/$(params.IMAGE_NAME)
+        - name: BUILDER_IMAGE
+          value: >-
+            registry.redhat.io/rhel8/buildah@sha256:bafb452c5346d8517d94639efa90e8d6d72cd11e45d49369c3d9305784d1c3f6
+        - name: STORAGE_DRIVER
+          value: vfs
+        - name: DOCKERFILE
+          value: ./Dockerfile
+        - name: CONTEXT
+          value: $(params.APP_PROFILE)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: FORMAT
+          value: oci
+        - name: BUILD_EXTRA_ARGS
+          value: ''
+        - name: PUSH_EXTRA_ARGS
+          value: ''
+        - name: SKIP_PUSH
+          value: 'false'
+      runAfter:
+        - build-source-app
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: source
+  workspaces:
+    - name: source
+    - name: maven-settings
+    - name: sonar-settings
+    - name: analyzer-source

@@ -8,8 +8,10 @@ configMapGenerator:
   files:
   - sonar-settings/settings.xml
 resources:
+- namespace.yaml
 - deployment.yaml
 - route.yaml
 - service.yaml
 - pipeline.yaml
-- namespace.yaml
+- source-pvc.yaml
+- analyzer-pvc.yaml

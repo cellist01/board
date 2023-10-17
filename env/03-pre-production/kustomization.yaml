@@ -9,6 +9,6 @@ patches:
   - path: patch/namespace-patch.yaml
     target:
       kind: Namespace
-  - path: patch/patch.yaml
+  - path: patch/deployment-patch.yaml
     target:
       kind: Deployment

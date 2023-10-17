@@ -9,7 +9,7 @@ configMapGenerator:
   - sonar-settings/settings.xml
 resources:
 - deployment.yaml
-#- route.yaml
-#- service.yaml
-#- pipeline.yaml
+- route.yaml
+- service.yaml
+- pipeline.yaml
 - namespace.yaml

@@ -1,8 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: board
-  name: 'board-application'
+  name: 'board'
 spec:
   replicas: 2
   selector:

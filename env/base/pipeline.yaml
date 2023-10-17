@@ -28,6 +28,9 @@ spec:
     - default: sqp_9d4fdc87bf27673252e126a624ed6772a9fd348b
       name: SONAR_AUTH_TOKEN
       type: string
+    - default: project
+      name: SONAR_PROJECT
+      type: string
   tasks:
     - name: git-clone-source
       params:
@@ -121,8 +124,8 @@ spec:
             - '-f'
             - Board
             - 'sonar:sonar'
-            - '-Dsonar.projectName=board-analyzer'
-            - '-Dsonar.projectKey=board-analyzer'
+            - '-Dsonar.projectName=$(params.SONAR_PROJECT)'
+            - '-Dsonar.projectKey=$(params.SONAR_PROJECT)'
             - '-s  $(workspaces.maven-settings.path)/settings.xml'
             - '-Dsonar.host.url=$(params.SONAR_URL)'
             - '-Dsonar.login=$(params.SONAR_AUTH_TOKEN)'

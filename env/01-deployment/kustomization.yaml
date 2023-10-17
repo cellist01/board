@@ -3,6 +3,6 @@ kind: Kustomization
 configMapGenerator:
 - name: generator-configmap-test
   files:
-  - ../base/settings.xml
+  - settings.xml
 bases:
 - ../base

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: board-application-analyzer-pipeline
+  name: sample-pipeline
 spec:
   params:
     - default: 'board/board-app:tag'

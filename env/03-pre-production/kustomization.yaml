@@ -13,3 +13,6 @@ patches:
   - path: patch/deployment-patch.yaml
     target:
       kind: Deployment
+  - path: patch/route-patch.yaml
+    target:
+      kind: Route

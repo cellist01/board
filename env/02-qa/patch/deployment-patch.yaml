@@ -3,4 +3,4 @@
   value: image-registry.openshift-image-registry.svc:5000/board-qa/board-app:init
 - op: add
   path: /spec/replicas
-  value: 2
+  value: 1

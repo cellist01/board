@@ -16,3 +16,6 @@ patches:
   - path: patch/route-patch.yaml
     target:
       kind: Route
+  - path: patch/pipeline-patch.yaml
+    target:
+      kind: Pipeline

@@ -3,7 +3,7 @@
   value: board-dev/board-app:init
 - op: add
   path: /spec/params/7/default
-  value: sqp_38216ca23d19c326a84265d2de0d3a95d3e30bff
+  value: sqp_7ce1858f8e39402126f0bbe9598f2a0b7b082088
 - op: add
   path: /spec/params/8/default
   value: board-dev
